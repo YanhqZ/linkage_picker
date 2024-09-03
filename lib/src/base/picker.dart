@@ -55,7 +55,7 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
 
   const LinkagePickerWidget({
     super.key,
-    this.title = '請選擇',
+    this.title = 'Select',
     required List<LinkagePickerData<T>> Function(LinkagePickerLevel, List<T>)
         dataBuilder,
     required bool Function(T, T) equalizer,
