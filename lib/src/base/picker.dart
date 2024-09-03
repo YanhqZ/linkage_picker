@@ -2,10 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-/// Linkage CupertinoPicker
-const _visibleItemCount = 5;
-const _itemExtent = 44.0;
+import 'package:linkage_picker/src/base/style.dart';
 
 enum LinkagePickerLevel {
   first,
@@ -31,6 +28,7 @@ typedef _PickerDataEqualizer<T> = bool Function(T value1, T value2);
 /// Convert picker selected result[selection] to navigation result.
 typedef _PickerResultConverter<T, R> = R Function(List<T> selection);
 
+/// Linkage CupertinoPicker
 class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// Datasource
   final _PickerDataBuilder<T> _dataBuilder;
@@ -53,6 +51,9 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// Initial value
   final List<T?>? initialValue;
 
+  /// Style
+  final LinkagePickerStyle pickerStyle;
+
   const LinkagePickerWidget({
     super.key,
     this.title = 'Select',
@@ -63,6 +64,7 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
     required R Function(List<T>) resultConverter,
     required T? Function(LinkagePickerLevel, T, List<T>) conflictResolver,
     this.initialValue,
+    this.pickerStyle = const LinkagePickerStyle(),
   })  : _conflictResolver = conflictResolver,
         _resultConverter = resultConverter,
         _equalizer = equalizer,
@@ -201,7 +203,8 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
           ),
         ),
         Container(
-          height: _itemExtent * _visibleItemCount.toDouble(),
+          height: widget.pickerStyle.itemExtent *
+              widget.pickerStyle.visibleItemCount.toDouble(),
           margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -215,18 +218,9 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
     );
   }
 
-  Widget _buildItem(String text, bool isSelected) {
+  Widget _buildItem(LinkagePickerData<T> data, bool isSelected) {
     return Center(
-      child: Text(
-        text,
-        style: () {
-          if (isSelected) {
-            return const TextStyle(fontSize: 16, color: Color(0xFF333333));
-          } else {
-            return const TextStyle(fontSize: 16, color: Color(0xFFB3B3B3));
-          }
-        }(),
-      ),
+      child: widget.pickerStyle.itemBuilder.call(data, isSelected),
     );
   }
 
@@ -235,6 +229,7 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
     Widget finalChild() {
       final data = dataSource[level.index];
       return _CustomCupertinoPicker(
+        style: widget.pickerStyle,
         scrollController: controllers[level.index],
         onSelectedItemChanged: (index) {
           values[level.index].value = data[index].value;
@@ -244,7 +239,7 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
                 valueListenable: values[level.index],
                 builder: (_, value, __) {
                   return _buildItem(
-                      e.title,
+                      e,
                       value == null
                           ? false
                           : widget._equalizer.call(value, e.value));
@@ -276,20 +271,14 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
 class _CustomCupertinoPicker extends CupertinoPicker {
   _CustomCupertinoPicker({
     super.scrollController,
+    required LinkagePickerStyle style,
     required super.onSelectedItemChanged,
     required super.children,
   }) : super(
-          itemExtent: _itemExtent,
-          diameterRatio: 10,
-          squeeze: 1,
-          selectionOverlay: Container(
-            height: _itemExtent,
-            decoration: const BoxDecoration(
-              border: Border.symmetric(
-                horizontal: BorderSide(color: Color(0xFFE6E6E6), width: 0.5),
-              ),
-            ),
-          ),
+          itemExtent: style.itemExtent,
+          diameterRatio: style.diameterRatio,
+          squeeze: style.squeeze,
+          selectionOverlay: style.selectionOverlay,
         );
 }
 

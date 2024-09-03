@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:linkage_picker/src/base/picker.dart';
+import 'package:linkage_picker/src/base/style.dart';
 
 /// A date picker widget.
 class DatePicker extends LinkagePickerWidget<int, DateTime> {
@@ -17,6 +18,7 @@ class DatePicker extends LinkagePickerWidget<int, DateTime> {
     String yearSuffix = '',
     String monthSuffix = '',
     String daySuffix = '',
+    super.pickerStyle = const LinkagePickerStyle(),
   }) : super(
           maxLevel: LinkagePickerLevel.third,
           equalizer: (value1, value2) => value1 == value2,
