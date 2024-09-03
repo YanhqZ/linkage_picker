@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:linkage_picker/src/base/picker.dart';
 
 /// A date picker widget.
-class TWDatePicker extends LinkagePickerWidget<int, DateTime> {
+class DatePicker extends LinkagePickerWidget<int, DateTime> {
   final DateTime start;
   final DateTime end;
   final DateTime? date;
 
-  TWDatePicker({
+  DatePicker({
     super.key,
     super.title,
     required this.start,
