@@ -54,7 +54,36 @@ class _MyHomePageState extends State<MyHomePage> {
                     start: DateTime(2000, today.month, today.day),
                     end: DateTime(2050, today.month, today.day),
                     date: date,
-                  ).showAsBottomSheet(context);
+                  ).showAsBottomSheet(
+                    context: context,
+                    topBarPadding: const EdgeInsets.all(16),
+                    cancel: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.4),
+                        fontSize: 18,
+                      ),
+                    ),
+                    title: Text(
+                      'Select',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    confirm: Text(
+                      'Confirm',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
                 },
                 converter: (DateTime data) {
                   return DateFormat('yyyy-MM-dd').format(data);

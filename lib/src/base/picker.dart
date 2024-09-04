@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:linkage_picker/src/base/style.dart';
+import 'package:linkage_picker/linkage_picker.dart';
 
 enum LinkagePickerLevel {
   first,
@@ -54,7 +53,9 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// Style
   final LinkagePickerStyle pickerStyle;
 
-  const LinkagePickerWidget({
+  late final LinkagePickerController<R> controller;
+
+  LinkagePickerWidget({
     super.key,
     this.title = 'Select',
     required List<LinkagePickerData<T>> Function(LinkagePickerLevel, List<T>)
@@ -73,25 +74,9 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   @override
   State<LinkagePickerWidget<T, R>> createState() =>
       _LinkagePickerWidgetState<T, R>();
-
-  Future<R?> showAsBottomSheet(BuildContext? context) {
-    if (context == null) {
-      return Future.value(null);
-    }
-    return showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-      ),
-      builder: (_) {
-        return this;
-      },
-    );
-  }
 }
 
-class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
+class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
   List<ValueNotifier<T?>> values = [];
   List<FixedExtentScrollController> controllers = [];
   List<List<LinkagePickerData<T>>> dataSource = [];
@@ -101,6 +86,7 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
   void initState() {
     super.initState();
     columns = widget.maxLevel.index + 1;
+    widget.controller = _LinkagePickerControllerImpl<T, R>();
     List.generate(columns, (index) {
       final level = LinkagePickerLevel.values[index];
       values.add(ValueNotifier(widget.initialValue?[index]));
@@ -153,69 +139,21 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewPadding.bottom,
-      ),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          height: 50,
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: Navigator.of(context).pop,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF666666),
-                    ),
-                  ),
-                ),
-              ) // .onTap(Navigator.of(context).pop)
-              ,
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF333333),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).pop<O>(widget._resultConverter.call(
-                      values.map((e) => e.value).whereType<T>().toList()));
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    'OK',
-                    style: TextStyle(color: Color(0xFFFF8000), fontSize: 14),
-                  ),
-                ),
-              )
-            ],
-          ),
+    return Builder(builder: (context) {
+      widget.controller.context = context;
+      return Container(
+        height: widget.pickerStyle.itemExtent *
+            widget.pickerStyle.visibleItemCount.toDouble(),
+        margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(columns, (index) {
+            return _buildPickerColumn(LinkagePickerLevel.values[index]);
+          }).map((e) => Flexible(child: e)).toList(),
         ),
-        Container(
-          height: widget.pickerStyle.itemExtent *
-              widget.pickerStyle.visibleItemCount.toDouble(),
-          margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(columns, (index) {
-              return _buildPickerColumn(LinkagePickerLevel.values[index]);
-            }).map((e) => Flexible(child: e)).toList(),
-          ),
-        ),
-      ]),
-    );
+      );
+    });
   }
 
   Widget _buildItem(LinkagePickerData<T> data, bool isSelected) {
@@ -264,6 +202,22 @@ class _LinkagePickerWidgetState<T, O> extends State<LinkagePickerWidget<T, O>> {
             });
       }
     });
+  }
+}
+
+class _LinkagePickerControllerImpl<T, R> implements LinkagePickerController<R> {
+  @override
+  BuildContext? context;
+
+  @override
+  R? get result {
+    final state =
+        context?.findAncestorStateOfType<_LinkagePickerWidgetState<T, R>>();
+    if (state != null) {
+      final values = state.values.map((e) => e.value).whereType<T>().toList();
+      return state.widget._resultConverter.call(values) as R?;
+    }
+    return null;
   }
 }
 
