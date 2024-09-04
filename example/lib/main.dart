@@ -1,8 +1,6 @@
+import 'package:example/picker_field/picker_field_custom1.dart';
+import 'package:example/picker_field/picker_field_date.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:linkage_picker/linkage_picker.dart';
-
-import 'picker_field.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,49 +44,9 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              PickerField<DateTime>(
-                hintText: 'Select date...',
-                onTap: (ctx, date) {
-                  final today = DateTime.now();
-                  return DatePicker(
-                    start: DateTime(2000, today.month, today.day),
-                    end: DateTime(2050, today.month, today.day),
-                    date: date,
-                  ).showAsBottomSheet(
-                    context: context,
-                    topBarPadding: const EdgeInsets.all(16),
-                    cancel: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.4),
-                        fontSize: 18,
-                      ),
-                    ),
-                    title: Text(
-                      'Select',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    confirm: Text(
-                      'Confirm',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                },
-                converter: (DateTime data) {
-                  return DateFormat('yyyy-MM-dd').format(data);
-                },
-              ),
+              PickerFieldDate(context),
+              const SizedBox(height: 20),
+              PickerFieldCustom1(context),
             ],
           ),
         ),

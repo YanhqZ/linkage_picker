@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PickerField<T> extends StatelessWidget {
+class PickerField<T> extends StatefulWidget {
   final Future<T?> Function(BuildContext, T?) onTap;
-  final String Function(T data) converter;
+  final Widget Function(T data) converter;
   final String hintText;
-  final ValueNotifier<T?> data = ValueNotifier(null);
 
-  PickerField({
+  const PickerField({
     super.key,
     required this.onTap,
     required this.hintText,
@@ -14,10 +13,17 @@ class PickerField<T> extends StatelessWidget {
   });
 
   @override
+  State<PickerField<T>> createState() => _PickerFieldState<T>();
+}
+
+class _PickerFieldState<T> extends State<PickerField<T>> {
+  final ValueNotifier<T?> data = ValueNotifier(null);
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final result = await onTap.call(context, data.value);
+        final result = await widget.onTap.call(context, data.value);
         if (result != null) {
           data.value = result;
         }
@@ -35,20 +41,22 @@ class PickerField<T> extends StatelessWidget {
                 valueListenable: data,
                 builder: (context, value, _) {
                   final shouldShowHint = value == null;
-                  return Text(
-                    shouldShowHint ? hintText : converter.call(value),
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: shouldShowHint
-                          ? Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.4)
-                          : Theme.of(context).colorScheme.onSurface,
-                    ),
-                  );
+                  return shouldShowHint
+                      ? Expanded(
+                          child: Text(
+                            widget.hintText,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.4),
+                            ),
+                          ),
+                        )
+                      : widget.converter.call(value);
                 }),
-            const Spacer(),
+            const SizedBox(width: 16),
             const Icon(Icons.arrow_forward_rounded),
           ],
         ),

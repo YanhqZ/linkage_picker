@@ -11,7 +11,6 @@ class DatePicker extends LinkagePickerWidget<int, DateTime> {
 
   DatePicker({
     super.key,
-    super.title,
     required this.start,
     required this.end,
     this.date,
@@ -21,7 +20,7 @@ class DatePicker extends LinkagePickerWidget<int, DateTime> {
     super.pickerStyle = const LinkagePickerStyle(),
   }) : super(
           maxLevel: LinkagePickerLevel.third,
-          equalizer: (value1, value2) => value1 == value2,
+          equalizer: (_, value1, value2) => value1 == value2,
           initialValue: [
             date?.year ?? DateTime.now().year,
             date?.month ?? DateTime.now().month,

@@ -35,7 +35,11 @@ class LinkagePickerStyle {
   /// Visible item count in picker
   final int visibleItemCount;
 
-  final Widget Function(LinkagePickerData, bool) itemBuilder;
+  final Widget Function(
+    LinkagePickerLevel level,
+    LinkagePickerData data,
+    bool isSelected,
+  ) itemBuilder;
 
   const LinkagePickerStyle({
     this.diameterRatio = defaultDiameterRatio,
@@ -50,11 +54,11 @@ class LinkagePickerStyle {
     this.itemBuilder = _buildDefaultItem,
   });
 
-  static Widget _buildDefaultItem(LinkagePickerData data, bool selected) {
+  static Widget _buildDefaultItem(LinkagePickerLevel level, LinkagePickerData data, bool isSelected) {
     return Text(
       data.title,
       style: TextStyle(
-        color: selected ? Colors.black : Colors.grey.withOpacity(0.7),
+        color: isSelected ? Colors.black : Colors.grey.withOpacity(0.7),
         fontSize: 16,
       ),
     );

@@ -21,8 +21,9 @@ typedef _PickerDataBuilder<T> = List<LinkagePickerData<T>> Function(
 typedef _PickerConflictResolver<T> = T? Function(
     LinkagePickerLevel level, T previous, List<T> currents);
 
-/// Tell Widget whether [value1] and [value2] are equal
-typedef _PickerDataEqualizer<T> = bool Function(T value1, T value2);
+/// Tell Widget whether [value1] and [value2] are equal in current [level].
+typedef _PickerDataEqualizer<T> = bool Function(
+    LinkagePickerLevel level, T value1, T value2);
 
 /// Convert picker selected result[selection] to navigation result.
 typedef _PickerResultConverter<T, R> = R Function(List<T> selection);
@@ -34,9 +35,6 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
 
   /// Max level
   final LinkagePickerLevel maxLevel;
-
-  /// Title
-  final String title;
 
   /// Equalizer
   final _PickerDataEqualizer<T> _equalizer;
@@ -53,19 +51,23 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// Style
   final LinkagePickerStyle pickerStyle;
 
+  /// Controller to access the result
   late final LinkagePickerController<R> controller;
+
+  /// If true, the pickers will not affect each other. Default is false.
+  final bool unLinkage;
 
   LinkagePickerWidget({
     super.key,
-    this.title = 'Select',
     required List<LinkagePickerData<T>> Function(LinkagePickerLevel, List<T>)
         dataBuilder,
-    required bool Function(T, T) equalizer,
+    required bool Function(LinkagePickerLevel, T, T) equalizer,
     required this.maxLevel,
     required R Function(List<T>) resultConverter,
     required T? Function(LinkagePickerLevel, T, List<T>) conflictResolver,
     this.initialValue,
     this.pickerStyle = const LinkagePickerStyle(),
+    this.unLinkage = false,
   })  : _conflictResolver = conflictResolver,
         _resultConverter = resultConverter,
         _equalizer = equalizer,
@@ -97,32 +99,35 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
       controllers.add(FixedExtentScrollController(
         initialItem: initial == null
             ? 0
-            : data.indexWhere(
-                (element) => widget._equalizer.call(element.value, initial)),
+            : data.indexWhere((element) =>
+                widget._equalizer.call(level, element.value, initial)),
       ));
     });
 
-    for (var i = 0; i < columns - 1; i++) {
-      final nextLevel = LinkagePickerLevel.values[i + 1];
-      values[i].addListener(() {
-        final parent = List.generate(i + 1, (index) => values[index].value)
-            .whereType<T>()
-            .toList();
-        dataSource[i + 1] = widget._dataBuilder.call(nextLevel, parent);
-        final resolved = widget._conflictResolver.call(
-            nextLevel,
-            values[i + 1].value!,
-            dataSource[i + 1].map((e) => e.value).toList());
+    if (widget.unLinkage == false) {
+      for (var i = 0; i < columns - 1; i++) {
+        final nextLevel = LinkagePickerLevel.values[i + 1];
+        values[i].addListener(() {
+          final parent = List.generate(i + 1, (index) => values[index].value)
+              .whereType<T>()
+              .toList();
+          dataSource[i + 1] = widget._dataBuilder.call(nextLevel, parent);
+          final resolved = widget._conflictResolver.call(
+              nextLevel,
+              values[i + 1].value!,
+              dataSource[i + 1].map((e) => e.value).toList());
 
-        if (resolved != null) {
-          final resolvedIndex = max(
-              0,
-              dataSource[i + 1].indexWhere((element) =>
-                  widget._equalizer.call(element.value, resolved)));
-          controllers[i + 1].jumpToItem(resolvedIndex);
-          values[i + 1].value = resolved;
-        }
-      });
+          if (resolved != null) {
+            final resolvedIndex = max(
+                0,
+                dataSource[i + 1].indexWhere((element) => widget._equalizer
+                    .call(LinkagePickerLevel.values[i + 1], element.value,
+                        resolved)));
+            controllers[i + 1].jumpToItem(resolvedIndex);
+            values[i + 1].value = resolved;
+          }
+        });
+      }
     }
   }
 
@@ -156,9 +161,10 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
     });
   }
 
-  Widget _buildItem(LinkagePickerData<T> data, bool isSelected) {
+  Widget _buildItem(
+      LinkagePickerLevel level, LinkagePickerData<T> data, bool isSelected) {
     return Center(
-      child: widget.pickerStyle.itemBuilder.call(data, isSelected),
+      child: widget.pickerStyle.itemBuilder.call(level, data, isSelected),
     );
   }
 
@@ -177,10 +183,11 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
                 valueListenable: values[level.index],
                 builder: (_, value, __) {
                   return _buildItem(
+                      level,
                       e,
                       value == null
                           ? false
-                          : widget._equalizer.call(value, e.value));
+                          : widget._equalizer.call(level, value, e.value));
                 }))
             .toList(),
       );
@@ -238,11 +245,12 @@ class _CustomCupertinoPicker extends CupertinoPicker {
 
 /// UI data model
 class LinkagePickerData<T> {
+  /// Can be displayed in the picker default item
   final String title;
   final T value;
 
   LinkagePickerData({
-    required this.title,
+    this.title = "",
     required this.value,
   });
 
