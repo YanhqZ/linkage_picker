@@ -2,8 +2,8 @@ import 'package:example/picker_field/picker_field.dart';
 import 'package:flutter/material.dart';
 import 'package:linkage_picker/linkage_picker.dart';
 
-class PickerFieldCustom1 extends PickerField<Color> {
-  PickerFieldCustom1(
+class PickerFieldCustomColorPalette extends PickerField<Color> {
+  PickerFieldCustomColorPalette(
     BuildContext context, {
     super.key,
   }) : super(

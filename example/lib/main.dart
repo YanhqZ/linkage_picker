@@ -1,5 +1,6 @@
-import 'package:example/picker_field/picker_field_custom1.dart';
-import 'package:example/picker_field/picker_field_date.dart';
+import 'package:example/picker_field/picker_field_custom_color_palette.dart';
+import 'package:example/picker_field/picker_field_date_bottom_sheet.dart';
+import 'package:example/picker_field/picker_field_date2.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -38,19 +39,46 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('Linkage Picker Example'),
       ),
       body: Container(
-        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              PickerFieldDate(context),
-              const SizedBox(height: 20),
-              PickerFieldCustom1(context),
+              pickerExampleSegment(
+                'DatePicker',
+                const PickerFieldDate2(),
+              ),
+              pickerExampleSegment(
+                'DatePicker[BottomSheet]',
+                PickerFieldDateBottomSheet(context),
+              ),
+              pickerExampleSegment(
+                'CustomPicker[ColorPalette]',
+                PickerFieldCustomColorPalette(context),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget pickerExampleSegment(String title, Widget child) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        child,
+        const SizedBox(height: 20),
+      ],
     );
   }
 }

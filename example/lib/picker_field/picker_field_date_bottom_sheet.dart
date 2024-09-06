@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:linkage_picker/linkage_picker.dart';
 
-class PickerFieldDate extends PickerField<DateTime> {
-  PickerFieldDate(BuildContext context, {super.key})
+class PickerFieldDateBottomSheet extends PickerField<DateTime> {
+  PickerFieldDateBottomSheet(BuildContext context, {super.key})
       : super(
           hintText: 'Select date',
           onTap: (ctx, date) {

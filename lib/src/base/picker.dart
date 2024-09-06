@@ -57,6 +57,8 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// If true, the pickers will not affect each other. Default is false.
   final bool unLinkage;
 
+  final ValueChanged<LinkagePickerController<R>>? _onControllerCreated;
+
   LinkagePickerWidget({
     super.key,
     required List<LinkagePickerData<T>> Function(LinkagePickerLevel, List<T>)
@@ -68,10 +70,13 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
     this.initialValue,
     this.pickerStyle = const LinkagePickerStyle(),
     this.unLinkage = false,
+    ValueChanged<LinkagePickerController<R>>? onControllerCreated,
   })  : _conflictResolver = conflictResolver,
         _resultConverter = resultConverter,
         _equalizer = equalizer,
-        _dataBuilder = dataBuilder;
+        _dataBuilder = dataBuilder,
+        _onControllerCreated = onControllerCreated
+  ;
 
   @override
   State<LinkagePickerWidget<T, R>> createState() =>
@@ -89,6 +94,7 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
     super.initState();
     columns = widget.maxLevel.index + 1;
     widget.controller = _LinkagePickerControllerImpl<T, R>();
+    widget._onControllerCreated?.call(widget.controller);
     List.generate(columns, (index) {
       final level = LinkagePickerLevel.values[index];
       values.add(ValueNotifier(widget.initialValue?[index]));
