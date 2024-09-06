@@ -1,6 +1,6 @@
 import 'package:example/picker_field/picker_field_custom_color_palette.dart';
 import 'package:example/picker_field/picker_field_date_bottom_sheet.dart';
-import 'package:example/picker_field/picker_field_date2.dart';
+import 'package:example/picker_field/picker_field_date.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               pickerExampleSegment(
                 'DatePicker',
-                const PickerFieldDate2(),
+                const PickerFieldDate(),
               ),
               pickerExampleSegment(
                 'DatePicker[BottomSheet]',

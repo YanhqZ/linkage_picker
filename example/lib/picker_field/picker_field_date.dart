@@ -1,20 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:linkage_picker/linkage_picker.dart';
 import 'package:intl/intl.dart';
 
-class PickerFieldDate2 extends StatefulWidget {
-  const PickerFieldDate2({
+class PickerFieldDate extends StatefulWidget {
+  const PickerFieldDate({
     super.key,
   });
 
   @override
-  State<PickerFieldDate2> createState() => _PickerFieldDate2State();
+  State<PickerFieldDate> createState() => _PickerFieldDateState();
 }
 
-class _PickerFieldDate2State extends State<PickerFieldDate2> {
+class _PickerFieldDateState extends State<PickerFieldDate> {
   final ValueNotifier<String> content = ValueNotifier('');
   final ValueNotifier<bool> showPicker = ValueNotifier(false);
   late DatePickerController controller;
