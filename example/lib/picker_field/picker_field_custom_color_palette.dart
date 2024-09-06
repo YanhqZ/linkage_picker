@@ -7,7 +7,7 @@ class PickerFieldCustomColorPalette extends PickerField<Color> {
     BuildContext context, {
     super.key,
   }) : super(
-          hintText: 'Custom1',
+          hintText: 'Select color',
           onTap: (ctx, color) {
             return _ColorPalettePicker(color).showAsBottomSheet(
               context: context,

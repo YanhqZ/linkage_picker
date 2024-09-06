@@ -1,4 +1,5 @@
 import 'package:example/picker_field/picker_field_custom_color_palette.dart';
+import 'package:example/picker_field/picker_field_custom_time.dart';
 import 'package:example/picker_field/picker_field_date_bottom_sheet.dart';
 import 'package:example/picker_field/picker_field_date.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,10 @@ class _MyHomePageState extends State<MyHomePage> {
               pickerExampleSegment(
                 'DatePicker[BottomSheet]',
                 PickerFieldDateBottomSheet(context),
+              ),
+              pickerExampleSegment(
+                'CustomPicker[Time]',
+                PickerFieldCustomTime(context),
               ),
               pickerExampleSegment(
                 'CustomPicker[ColorPalette]',

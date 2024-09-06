@@ -43,7 +43,7 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   final _PickerResultConverter<T, R> _resultConverter;
 
   /// ConflictResolver
-  final _PickerConflictResolver<T> _conflictResolver;
+  final _PickerConflictResolver<T>? _conflictResolver;
 
   /// Initial value
   final List<T?>? initialValue;
@@ -54,7 +54,8 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
   /// Controller to access the result
   late final LinkagePickerController<R> controller;
 
-  /// If true, the pickers will not affect each other. Default is false.
+  /// If true, the pickers will not affect each other so You don't need to achieve [_conflictResolver].
+  /// Default is false.
   final bool unLinkage;
 
   final ValueChanged<LinkagePickerController<R>>? _onControllerCreated;
@@ -66,7 +67,7 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
     required bool Function(LinkagePickerLevel, T, T) equalizer,
     required this.maxLevel,
     required R Function(List<T>) resultConverter,
-    required T? Function(LinkagePickerLevel, T, List<T>) conflictResolver,
+    T? Function(LinkagePickerLevel, T, List<T>)? conflictResolver,
     this.initialValue,
     this.pickerStyle = const LinkagePickerStyle(),
     this.unLinkage = false,
@@ -118,7 +119,7 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
               .whereType<T>()
               .toList();
           dataSource[i + 1] = widget._dataBuilder.call(nextLevel, parent);
-          final resolved = widget._conflictResolver.call(
+          final resolved = widget._conflictResolver?.call(
               nextLevel,
               values[i + 1].value!,
               dataSource[i + 1].map((e) => e.value).toList());
@@ -153,8 +154,7 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
     return Builder(builder: (context) {
       widget.controller.context = context;
       return Container(
-        height: widget.pickerStyle.itemExtent *
-            widget.pickerStyle.visibleItemCount.toDouble(),
+        height: widget.pickerStyle.itemExtent * widget.pickerStyle.heightRatio,
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Row(
           mainAxisSize: MainAxisSize.max,

@@ -4,7 +4,7 @@ import 'package:linkage_picker/linkage_picker.dart';
 
 class LinkagePickerStyle {
   static const double defaultItemExtent = 44.0;
-  static const int defaultVisibleItemCount = 5;
+  static const double defaultHeightRatio = 5.0;
   static const double defaultDiameterRatio = 10;
   static const double defaultSqueeze = 1;
 
@@ -32,8 +32,8 @@ class LinkagePickerStyle {
   /// See [CupertinoPicker.selectionOverlay] for more details.
   final Widget selectionOverlay;
 
-  /// Visible item count in picker
-  final int visibleItemCount;
+  /// The radio for picker height to item extent.
+  final double heightRatio;
 
   final Widget Function(
     LinkagePickerLevel level,
@@ -50,7 +50,7 @@ class LinkagePickerStyle {
     this.itemExtent = defaultItemExtent,
     this.squeeze = defaultSqueeze,
     this.selectionOverlay = const LinkagePickerDefaultSelectionOverlay(),
-    this.visibleItemCount = defaultVisibleItemCount,
+    this.heightRatio = defaultHeightRatio,
     this.itemBuilder = _buildDefaultItem,
   });
 
