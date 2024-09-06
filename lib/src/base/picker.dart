@@ -60,6 +60,7 @@ class LinkagePickerWidget<T, R> extends StatefulWidget {
 
   final ValueChanged<LinkagePickerController<R>>? _onControllerCreated;
 
+  // ignore: prefer_const_constructors_in_immutables
   LinkagePickerWidget({
     super.key,
     required List<LinkagePickerData<T>> Function(LinkagePickerLevel, List<T>)
@@ -119,10 +120,11 @@ class _LinkagePickerWidgetState<T, R> extends State<LinkagePickerWidget<T, R>> {
               .whereType<T>()
               .toList();
           dataSource[i + 1] = widget._dataBuilder.call(nextLevel, parent);
-          final resolved = widget._conflictResolver?.call(
-              nextLevel,
-              values[i + 1].value!,
-              dataSource[i + 1].map((e) => e.value).toList());
+          final previous = values[i + 1].value;
+          final resolved = previous == null
+              ? null
+              : widget._conflictResolver?.call(nextLevel, previous,
+                  dataSource[i + 1].map((e) => e.value).toList());
 
           if (resolved != null) {
             final resolvedIndex = max(
